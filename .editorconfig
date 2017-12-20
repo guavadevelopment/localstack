@@ -1,0 +1,16 @@
+# Life's too short for some of the trivial differences that come up
+# from people editing files in different platforms/editors.
+#
+# Help us avoid those by making sure you've got the EditorConfig plugin
+# enabled for whatever editor you use.
+#
+# See http://editorconfig.org/
+#
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true

@@ -59,12 +59,19 @@ if not LAMBDA_EXECUTOR:
     except Exception as e:
         pass
 
+# the network to start the lambda executor docker instance(s) in
+LAMBDA_DOCKER_NETWORK = os.environ.get('LAMBDA_DOCKER_NETWORK', '').strip()
+
+# the custom dns server used for name resolution in the lambda executor docker instance(s)
+LAMBDA_DOCKER_DNS = os.environ.get('LAMBDA_DOCKER_DNS', '').strip()
+
 # list of environment variable names used for configuration.
 # Make sure to keep this in sync with the above!
 # Note: do *not* include DATA_DIR in this list, as it is treated separately
 CONFIG_ENV_VARS = ['SERVICES', 'HOSTNAME', 'HOSTNAME_EXTERNAL', 'LOCALSTACK_HOSTNAME',
     'LAMBDA_EXECUTOR', 'LAMBDA_REMOTE_DOCKER', 'USE_SSL', 'LICENSE_KEY', 'DEBUG',
-    'KINESIS_ERROR_PROBABILITY', 'DYNAMODB_ERROR_PROBABILITY', 'PORT_WEB_UI']
+    'KINESIS_ERROR_PROBABILITY', 'DYNAMODB_ERROR_PROBABILITY', 'PORT_WEB_UI',
+    'LAMBDA_DOCKER_NETWORK', 'LAMBDA_DOCKER_DNS']
 for key, value in iteritems(DEFAULT_SERVICE_PORTS):
     backend_override_var = '%s_BACKEND' % key.upper().replace('-', '_')
     if os.environ.get(backend_override_var):

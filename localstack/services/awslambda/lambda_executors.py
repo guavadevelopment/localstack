@@ -215,20 +215,25 @@ class LambdaExecutorReuseContainers(LambdaExecutorContainers):
                 self.destroy_docker_container(func_arn)
 
                 env_vars_str = ' '.join(['-e {}={}'.format(k, cmd_quote(v)) for (k, v) in env_vars])
+                net = config.LAMBDA_DOCKER_NETWORK
+                dns = config.LAMBDA_DOCKER_DNS
 
                 # Create and start the container
                 LOG.debug('Creating container: %s' % container_name)
-                cmd = (
-                    'docker create'
-                    ' --name "%s"'
-                    ' --entrypoint /bin/bash'  # Load bash when it starts.
-                    ' --interactive'  # Keeps the container running bash.
-                    ' -e AWS_LAMBDA_EVENT_BODY="$AWS_LAMBDA_EVENT_BODY"'
-                    ' -e HOSTNAME="$HOSTNAME"'
-                    ' -e LOCALSTACK_HOSTNAME="$LOCALSTACK_HOSTNAME"'
-                    '  %s'  # env_vars
-                    ' lambci/lambda:%s'
-                ) % (container_name, env_vars_str, runtime)
+                cmd_list = [
+                    'docker create',
+                    ' --name "%s"' % container_name,
+                    ' --entrypoint /bin/bash',  # Load bash when it starts.
+                    ' --interactive',  # Keeps the container running bash.
+                    ' --net %s' % net if net != '' else '',  # Start with configured network
+                    ' --dns %s' % dns if dns != '' else '',  # Start with configured dns
+                    ' -e AWS_LAMBDA_EVENT_BODY="$AWS_LAMBDA_EVENT_BODY"',
+                    ' -e HOSTNAME="$HOSTNAME"',
+                    ' -e LOCALSTACK_HOSTNAME="$LOCALSTACK_HOSTNAME"',
+                    '  %s' % env_vars_str,  # env_vars
+                    ' lambci/lambda:%s' % runtime,
+                ]
+                cmd = ''.join(cmd_list)
                 LOG.debug(cmd)
                 run(cmd, stderr=subprocess.PIPE, outfile=subprocess.PIPE)
 
